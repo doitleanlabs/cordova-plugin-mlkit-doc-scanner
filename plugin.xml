@@ -6,6 +6,12 @@
     <license>Apache 2.0</license>
     <keywords>cordova,mlkit,document,scanner</keywords>
 
+    <engines>
+        <engine name="cordova" version=">=11.0.0" />
+        <engine name="cordova-android" version=">=12.0.0" />
+        <engine name="cordova-ios" version=">=7.0.0" />
+    </engines>
+
     <js-module src="www/ml-kit-doc-scanner.js" name="MLKitDocScanner">
         <clobbers target="cordova.plugins.MLKitDocScanner" />
     </js-module>
@@ -21,9 +27,27 @@
 
         <source-file src="src/android/MLKitDocScannerPlugin.java" target-dir="src/com/example/mlkit/docscanner" />
 
-        <framework src="com.google.android.gms:play-services-mlkit-document-scanner:16.0.0-beta1" />
-        <framework src="androidx.appcompat:appcompat:1.4.1" />
-        <framework src="androidx.activity:activity:1.4.0" />
+        <framework src="com.google.android.gms:play-services-mlkit-document-scanner:16.0.0" />
+        <framework src="androidx.appcompat:appcompat:1.7.0" />
+        <framework src="androidx.activity:activity:1.9.3" />
+    </platform>
+
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="MLKitDocScannerPlugin">
+                <param name="ios-package" value="MLKitDocScannerPlugin" />
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <source-file src="src/ios/MLKitDocScannerPlugin.swift" />
+
+        <framework src="VisionKit.framework" weak="true" />
+        <framework src="PDFKit.framework" />
+
+        <config-file target="*-Info.plist" parent="NSCameraUsageDescription">
+            <string>This app requires camera access to scan documents.</string>
+        </config-file>
     </platform>
 </plugin>
 

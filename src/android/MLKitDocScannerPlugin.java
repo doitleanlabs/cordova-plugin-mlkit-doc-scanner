@@ -7,36 +7,23 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.content.IntentSender;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.IntentSenderRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import android.content.pm.PackageManager;
-import android.Manifest;
 
 import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions;
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanning;
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult;
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanner;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class MLKitDocScannerPlugin extends CordovaPlugin {
 
     private CallbackContext callbackContext;
     private ActivityResultLauncher<IntentSenderRequest> scannerLauncher;
-    private ActivityResultLauncher<String[]> requestPermissionsLauncher;
 
-    private static final String[] REQUIRED_PERMISSIONS = {
-        Manifest.permission.CAMERA
-    };
-    
     // Error constants
     private static final String ERROR_SCANNING_RESULT_NULL = "SCANNING_RESULT_NULL";
     private static final String ERROR_NO_PAGES_SCANNED = "NO_PAGES_SCANNED";
@@ -47,7 +34,8 @@ public class MLKitDocScannerPlugin extends CordovaPlugin {
     
     @Override
     protected void pluginInitialize() {
-        scannerLauncher = cordova.getActivity().registerForActivityResult(
+        AppCompatActivity activity = (AppCompatActivity) cordova.getActivity();
+        scannerLauncher = activity.registerForActivityResult(
             new ActivityResultContracts.StartIntentSenderForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
@@ -149,17 +137,15 @@ public class MLKitDocScannerPlugin extends CordovaPlugin {
         JSONObject resultJson = new JSONObject();
         try {
             List<GmsDocumentScanningResult.Page> pages = result.getPages();
-             // If the format is RESULT_FORMAT_JPEG
-            if (pages != null) {
-                JSONArray pagesJsonArray = new JSONArray();
-                for (GmsDocumentScanningResult.Page page : pages) {
-                    pagesJsonArray.put(page.getImageUri());
-                }
-                resultJson.put("images", pagesJsonArray);
-            } else if (pages == null || pages.isEmpty()) {
+            if (pages == null || pages.isEmpty()) {
                 sendError(ERROR_NO_PAGES_SCANNED, "No pages were scanned");
                 return;
             }
+            JSONArray pagesJsonArray = new JSONArray();
+            for (GmsDocumentScanningResult.Page page : pages) {
+                pagesJsonArray.put(page.getImageUri());
+            }
+            resultJson.put("images", pagesJsonArray);
             
             // If the format is RESULT_FORMAT_PDF
             if (result.getPdf() != null) {

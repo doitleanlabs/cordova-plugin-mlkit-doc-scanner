@@ -5,7 +5,8 @@
   "cordova": {
     "id": "@dani.dev.pm/cordova-plugin-mlkit-doc-scanner",
     "platforms": [
-      "android"
+      "android",
+      "ios"
     ]
   },
   "keywords": [

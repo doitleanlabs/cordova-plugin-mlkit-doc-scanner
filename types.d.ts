@@ -67,7 +67,12 @@ declare module '@dani.dev.pm/cordova-plugin-mlkit-doc-scanner' {
         /**
          * Error code indicating that the scanning failed.
          */
-        SCANNING_FAILED = 'SCANNING_FAILED'
+        SCANNING_FAILED = 'SCANNING_FAILED',
+
+        /**
+         * Error code indicating that document scanning is not supported on this device (iOS only).
+         */
+        SCANNER_NOT_SUPPORTED = 'SCANNER_NOT_SUPPORTED'
     }
 
     /**
