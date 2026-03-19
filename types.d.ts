@@ -18,6 +18,56 @@ declare module '@dani.dev.pm/cordova-plugin-mlkit-doc-scanner' {
          * Whether to include a PDF in the scan result. (Default: true)
          */
         includePdf?: boolean;
+
+        /**
+         * Whether gallery import is enabled. (Default: true)
+         * Android: supported.
+         * iOS: accepted for API compatibility.
+         */
+        galleryImportAllowed?: boolean;
+
+        /**
+         * Scanner mode.
+         * Android: supported (base/full).
+         * iOS: accepted for API compatibility.
+         */
+        scannerMode?: 'base' | 'full';
+
+        /**
+         * Whether to return base64 content in addition to file URIs. (Default: false)
+         */
+        returnBase64?: boolean;
+
+        /**
+         * JPEG compression quality from 0 to 100. (Default: 90)
+         */
+        jpegQuality?: number;
+
+        /**
+         * Enable/disable automatic crop.
+         * Android: influences scanner mode selection.
+         * iOS: accepted for API compatibility.
+         */
+        autoCrop?: boolean;
+
+        /**
+         * Enable/disable automatic enhancement.
+         * Android: influences scanner mode selection.
+         * iOS: accepted for API compatibility.
+         */
+        autoEnhance?: boolean;
+
+        /**
+         * Preferred locale (e.g. pt-BR, en-US).
+         * Currently accepted for API compatibility.
+         */
+        locale?: string;
+
+        /**
+         * Whether to open an additional preview after scan.
+         * Currently accepted for API compatibility.
+         */
+        openPreviewAfterScan?: boolean;
     }
 
     /**
@@ -33,6 +83,16 @@ declare module '@dani.dev.pm/cordova-plugin-mlkit-doc-scanner' {
          * URI of the PDF if PDF format is included.
          */
         pdf?: string;
+
+        /**
+         * Array of image base64 strings when returnBase64=true.
+         */
+        imagesBase64?: string[];
+
+        /**
+         * PDF base64 when returnBase64=true and PDF is enabled.
+         */
+        pdfBase64?: string;
     }
 
     /**
@@ -99,7 +159,7 @@ declare module '@dani.dev.pm/cordova-plugin-mlkit-doc-scanner' {
          * @param options Options for scanning the document.
          * @returns A promise that resolves to the scan result.
          */
-        scanDocument(options: ScanOptions): Promise<ScanResult>;
+        scanDocument(options?: ScanOptions): Promise<ScanResult>;
     }
 
     const MLKitDocScanner: MLKitDocScanner;

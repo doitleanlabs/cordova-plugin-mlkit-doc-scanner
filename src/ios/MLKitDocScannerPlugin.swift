@@ -10,15 +10,49 @@ class MLKitDocScannerPlugin: CDVPlugin, VNDocumentCameraViewControllerDelegate {
     private var includeJpeg = true
     private var includePdf = true
     private var pageLimit = 0
+    private var galleryImportAllowed = true
+    private var scannerMode = "full"
+    private var returnBase64 = false
+    private var jpegQuality = 90
+    private var autoCrop = true
+    private var autoEnhance = true
+    private var locale = ""
+    private var openPreviewAfterScan = false
 
     @objc(scanDocument:)
     func scanDocument(_ command: CDVInvokedUrlCommand) {
         callbackId = command.callbackId
 
+        includeJpeg = true
+        includePdf = true
+        pageLimit = 0
+        galleryImportAllowed = true
+        scannerMode = "full"
+        returnBase64 = false
+        jpegQuality = 90
+        autoCrop = true
+        autoEnhance = true
+        locale = ""
+        openPreviewAfterScan = false
+
         if let options = command.arguments.first as? [String: Any] {
             includeJpeg = options["includeJpeg"] as? Bool ?? true
             includePdf = options["includePdf"] as? Bool ?? true
             pageLimit = options["pageLimit"] as? Int ?? 0
+            galleryImportAllowed = options["galleryImportAllowed"] as? Bool ?? true
+            scannerMode = options["scannerMode"] as? String ?? "full"
+            returnBase64 = options["returnBase64"] as? Bool ?? false
+            jpegQuality = options["jpegQuality"] as? Int ?? 90
+            autoCrop = options["autoCrop"] as? Bool ?? true
+            autoEnhance = options["autoEnhance"] as? Bool ?? true
+            locale = options["locale"] as? String ?? ""
+            openPreviewAfterScan = options["openPreviewAfterScan"] as? Bool ?? false
+        }
+
+        if jpegQuality < 0 {
+            jpegQuality = 0
+        } else if jpegQuality > 100 {
+            jpegQuality = 100
         }
 
         guard VNDocumentCameraViewController.isSupported else {
@@ -65,12 +99,19 @@ class MLKitDocScannerPlugin: CDVPlugin, VNDocumentCameraViewControllerDelegate {
 
         if includeJpeg {
             let uris = images.enumerated().compactMap { (index, image) -> String? in
-                guard let data = image.jpegData(compressionQuality: 0.9) else { return nil }
+                guard let data = image.jpegData(compressionQuality: CGFloat(jpegQuality) / 100.0) else { return nil }
                 let url = FileManager.default.temporaryDirectory.appendingPathComponent("scan_page_\(index + 1).jpg")
                 try? data.write(to: url)
                 return url.absoluteString
             }
             result["images"] = uris
+
+            if returnBase64 {
+                let base64Images = images.compactMap { image in
+                    image.jpegData(compressionQuality: CGFloat(jpegQuality) / 100.0)?.base64EncodedString()
+                }
+                result["imagesBase64"] = base64Images
+            }
         }
 
         if includePdf {
@@ -83,8 +124,21 @@ class MLKitDocScannerPlugin: CDVPlugin, VNDocumentCameraViewControllerDelegate {
             let pdfUrl = FileManager.default.temporaryDirectory.appendingPathComponent("scan_document.pdf")
             if pdfDoc.write(to: pdfUrl) {
                 result["pdf"] = pdfUrl.absoluteString
+                if returnBase64, let pdfData = try? Data(contentsOf: pdfUrl) {
+                    result["pdfBase64"] = pdfData.base64EncodedString()
+                }
             }
         }
+
+        // These options are currently accepted for API compatibility.
+        // VisionKit does not expose explicit toggles for scanner mode, locale, crop/enhance,
+        // gallery import, or an additional post-scan preview screen.
+        _ = galleryImportAllowed
+        _ = scannerMode
+        _ = autoCrop
+        _ = autoEnhance
+        _ = locale
+        _ = openPreviewAfterScan
 
         let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: result)
         commandDelegate.send(pluginResult, callbackId: callbackId)

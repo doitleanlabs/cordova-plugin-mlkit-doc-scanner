@@ -56,6 +56,14 @@ Options for scanning documents.
 | `pageLimit?` | `number` | The maximum number of pages to scan. | No limit |
 | `includeJpeg?` | `boolean` | Whether to include JPEG images in the scan result. | `true` |
 | `includePdf?` | `boolean` | Whether to include a PDF in the scan result. | `true` |
+| `galleryImportAllowed?` | `boolean` | Enable gallery import. Android supported; iOS accepted for API compatibility. | `true` |
+| `scannerMode?` | `'base' \| 'full'` | Scanner mode. Android supported; iOS accepted for API compatibility. | `'full'` |
+| `returnBase64?` | `boolean` | Return base64 payloads (`imagesBase64`, `pdfBase64`) in addition to URIs. | `false` |
+| `jpegQuality?` | `number` | JPEG quality from 0 to 100. | `90` |
+| `autoCrop?` | `boolean` | Auto crop. Android influences scanner mode; iOS accepted for API compatibility. | `true` |
+| `autoEnhance?` | `boolean` | Auto enhance. Android influences scanner mode; iOS accepted for API compatibility. | `true` |
+| `locale?` | `string` | Preferred locale (e.g. `pt-BR`). Accepted for API compatibility. | `""` |
+| `openPreviewAfterScan?` | `boolean` | Open additional preview after scan. Accepted for API compatibility. | `false` |
 
 #### ScanError
 
@@ -74,6 +82,8 @@ Result of a document scan.
 |----------|------|-------------|
 | `images?` | `string[]` | Array of image URIs if JPEG format is included. |
 | `pdf?` | `string` | URI of the PDF if PDF format is included. |
+| `imagesBase64?` | `string[]` | Base64-encoded JPEG pages when `returnBase64=true`. |
+| `pdfBase64?` | `string` | Base64-encoded PDF when `returnBase64=true`. |
 
 ### Error Codes
 
@@ -96,7 +106,15 @@ import MLKitDocScanner from '@dani.dev.pm/cordova-plugin-mlkit-doc-scanner';
 const scanOptions: ScanOptions = {
     pageLimit: 5,
     includeJpeg: true,
-    includePdf: true
+    includePdf: true,
+    galleryImportAllowed: true,
+    scannerMode: 'full',
+    returnBase64: true,
+    jpegQuality: 85,
+    autoCrop: true,
+    autoEnhance: true,
+    locale: 'pt-BR',
+    openPreviewAfterScan: false
 };
 
 try {

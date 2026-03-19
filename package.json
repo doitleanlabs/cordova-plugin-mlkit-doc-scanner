@@ -1,6 +1,6 @@
 {
   "name": "@dani.dev.pm/cordova-plugin-mlkit-doc-scanner",
-  "version": "0.0.5",
+  "version": "0.2.0",
   "description": "A Cordova plugin for ML Kit Document Scanner",
   "cordova": {
     "id": "@dani.dev.pm/cordova-plugin-mlkit-doc-scanner",
